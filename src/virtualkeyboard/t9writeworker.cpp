@@ -43,6 +43,7 @@ namespace QtVirtualKeyboard {
 T9WriteTask::T9WriteTask(QObject *parent) :
     QObject(parent),
     decumaSession(0),
+    abstractDecuma(),
     runSema()
 {
 }
@@ -83,9 +84,9 @@ void T9WriteDictionaryTask::run()
 
             DECUMA_SRC_DICTIONARY_INFO dictionaryInfo;
             memset(&dictionaryInfo, 0, sizeof(dictionaryInfo));
-            dictionaryInfo.srcType = decumaXT9LDB;
+            dictionaryInfo.srcType = decumaPortableHWRDictionary;
             DECUMA_UINT32 dictionarySize = 0;
-            DECUMA_STATUS status = decumaConvertDictionary(&dictionary, dictionaryData, dictionaryFile.size(), &dictionaryInfo, &dictionarySize, &memFuncs);
+            DECUMA_STATUS status = abstractDecuma->aDecumaConvertDictionary(&dictionary, dictionaryData, dictionaryFile.size(), &dictionaryInfo, &dictionarySize, &memFuncs);
             Q_UNUSED(status)
             Q_ASSERT(status == decumaNoError);
             dictionaryFile.unmap(dictionaryData);
@@ -176,15 +177,15 @@ void T9WriteRecognitionTask::run()
     perf.start();
 #endif
 
-    DECUMA_STATUS status = decumaIndicateInstantGesture(decumaSession, &result->instantGesture, &instantGestureSettings);
+    DECUMA_STATUS status = abstractDecuma->aDecumaIndicateInstantGesture(decumaSession, &result->instantGesture, &instantGestureSettings);
     Q_ASSERT(status == decumaNoError);
 
     DECUMA_INTERRUPT_FUNCTIONS interruptFunctions;
     interruptFunctions.pShouldAbortRecognize = shouldAbortRecognize;
     interruptFunctions.pUserData = (void *)this;
-    status = decumaRecognize(decumaSession, result->results.data(), result->results.size(), &result->numResults, result->maxCharsPerWord, &recSettings, &interruptFunctions);
+    status = abstractDecuma->aDecumaRecognize(decumaSession, result->results.data(), result->results.size(), &result->numResults, result->maxCharsPerWord, &recSettings, &interruptFunctions);
     if (status == decumaAbortRecognitionUnsupported)
-        status = decumaRecognize(decumaSession, result->results.data(), result->results.size(), &result->numResults, result->maxCharsPerWord, &recSettings, NULL);
+        status = abstractDecuma->aDecumaRecognize(decumaSession, result->results.data(), result->results.size(), &result->numResults, result->maxCharsPerWord, &recSettings, NULL);
     Q_ASSERT(status == decumaNoError);
 
     QStringList resultList;
@@ -306,11 +307,12 @@ void T9WriteRecognitionResultsTask::run()
     \internal
 */
 
-T9WriteWorker::T9WriteWorker(DECUMA_SESSION *decumaSession, QObject *parent) :
+T9WriteWorker::T9WriteWorker(DECUMA_SESSION *decumaSession, QSharedPointer<AbstractDecuma> abstractDecuma, QObject *parent) :
     QThread(parent),
     taskSema(),
     taskLock(),
     decumaSession(decumaSession),
+    abstractDecuma(abstractDecuma),
     abort(false)
 {
 }
@@ -369,6 +371,7 @@ void T9WriteWorker::run()
         }
         if (currentTask) {
             currentTask->decumaSession = decumaSession;
+            currentTask->abstractDecuma = abstractDecuma;
             currentTask->run();
             currentTask->runSema.release();
         }

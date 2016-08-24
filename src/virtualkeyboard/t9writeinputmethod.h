@@ -41,6 +41,8 @@ class T9WriteInputMethod : public AbstractInputMethod
     Q_OBJECT
     Q_DECLARE_PRIVATE(T9WriteInputMethod)
 
+    Q_PROPERTY(int handwritingTimeout READ getHandwritingTimeout WRITE setHandwritingTimeout NOTIFY handwritingTimeoutChanged)
+
 public:
     explicit T9WriteInputMethod(QObject *parent = 0);
     ~T9WriteInputMethod();
@@ -66,12 +68,23 @@ public:
 
     bool reselect(int cursorPosition, const InputEngine::ReselectFlags &reselectFlags);
 
+    void setHandwritingTimeout(const int aHandwritingTimeout);
+
+signals:
+    void handwritingTimeoutChanged(const int aHandwritingTimeout);
+
 protected:
     void timerEvent(QTimerEvent *timerEvent);
 
 protected slots:
     void dictionaryLoadCompleted(const QString &fileUri, void *dictionary);
     void resultsAvailable(const QVariantList &resultList);
+
+public slots:
+    int getHandwritingTimeout();
+
+private:
+    int m_handwritingTimeout;
 };
 
 }

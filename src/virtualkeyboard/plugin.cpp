@@ -121,9 +121,6 @@ QPlatformInputContext *QVirtualKeyboardPlugin::create(const QString &system, con
     Q_INIT_RESOURCE(content);
     Q_INIT_RESOURCE(default_style);
     Q_INIT_RESOURCE(retro_style);
-#ifdef HAVE_T9WRITE
-    Q_INIT_RESOURCE(t9write_db);
-#endif
 #ifdef HAVE_LAYOUTS
     Q_INIT_RESOURCE(layouts);
 #endif
@@ -137,6 +134,11 @@ QPlatformInputContext *QVirtualKeyboardPlugin::create(const QString &system, con
     Q_VKB_IMPORT_PLUGIN(QtQuickLayoutsPlugin)
     Q_VKB_IMPORT_PLUGIN(QmlFolderListModelPlugin)
     Q_VKB_IMPORT_PLUGIN(QtVirtualKeyboardStylesPlugin)
+#endif
+#ifdef HAVE_T9WRITE
+        QString t9write_datapath = QLibraryInfo::location(QLibraryInfo::DataPath) + "/qtvirtualkeyboard/t9write/t9write_db.rcc";
+        if (!QResource::registerResource(t9write_datapath))
+            return Q_NULLPTR;
 #endif
 
     qmlRegisterSingletonType<InputContext>(pluginUri, 1, 0, "InputContext", createInputContextModule);

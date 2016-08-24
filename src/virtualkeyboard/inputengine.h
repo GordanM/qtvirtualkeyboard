@@ -70,6 +70,7 @@ public:
         Latin,
         Numeric,
         Dialable,
+        Arabic,
         Pinyin,
         Cangjie,
         Zhuyin,

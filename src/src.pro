@@ -29,7 +29,9 @@ lipi-toolkit {
 
 t9write {
     SUBDIRS += virtualkeyboard/3rdparty/t9write
+    SUBDIRS += virtualkeyboard/3rdparty/t9write/t9libraries
     virtualkeyboard.depends += virtualkeyboard/3rdparty/t9write
+    virtualkeyboard.depends += virtualkeyboard/3rdparty/t9write/t9libraries
 }
 
 SUBDIRS += \

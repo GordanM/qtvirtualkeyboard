@@ -42,6 +42,7 @@
 #include <QVector>
 
 #include "decuma_hwr.h"
+#include "abstractdecuma.h"
 
 namespace QtVirtualKeyboard {
 
@@ -59,6 +60,7 @@ public:
 
 protected:
     DECUMA_SESSION *decumaSession;
+    QSharedPointer<AbstractDecuma> abstractDecuma;
 
 private:
     QSemaphore runSema;
@@ -144,7 +146,7 @@ class T9WriteWorker : public QThread
 {
     Q_OBJECT
 public:
-    explicit T9WriteWorker(DECUMA_SESSION *decumaSession, QObject *parent = 0);
+    explicit T9WriteWorker(DECUMA_SESSION *decumaSession, QSharedPointer<AbstractDecuma> abstractDecuma, QObject *parent = 0);
     ~T9WriteWorker();
 
     void addTask(QSharedPointer<T9WriteTask> task);
@@ -175,6 +177,7 @@ private:
     QSemaphore taskSema;
     QMutex taskLock;
     DECUMA_SESSION *decumaSession;
+    QSharedPointer<AbstractDecuma> abstractDecuma;
     bool abort;
 };
 

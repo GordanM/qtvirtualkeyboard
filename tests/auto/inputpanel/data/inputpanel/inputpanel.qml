@@ -214,6 +214,8 @@ InputPanel {
             return InputEngine.Numeric
         else if (inputModeName === "Dialable")
             return InputEngine.Dialable
+        else if (inputModeName === "Arabic")
+            return InputEngine.Arabic
         else if (inputModeName === "Pinyin")
             return InputEngine.Pinyin
         else if (inputModeName === "Cangjie")

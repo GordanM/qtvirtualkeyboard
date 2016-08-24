@@ -332,14 +332,17 @@ t9write {
               "the contents of the T9Write SDK to $$PWD/3rdparty/t9write")
     SOURCES += \
         t9writeinputmethod.cpp \
-        t9writeworker.cpp
+        t9writeworker.cpp \
+        abstractdecuma.cpp \
+
     HEADERS += \
         t9writeinputmethod.h \
-        t9writeworker.h
+        t9writeworker.h \
+        abstractdecuma.h \
+
     DEFINES += HAVE_T9WRITE
-    QMAKE_USE += t9write_db
     INCLUDEPATH += $$T9WRITE_INCLUDE_DIRS
-    LIBS += $$T9WRITE_ALPHABETIC_LIBS
+    LIBS += -L$$T9WRITE_LIBS
 }
 
 arrow-key-navigation: DEFINES += QT_VIRTUALKEYBOARD_ARROW_KEY_NAVIGATION
